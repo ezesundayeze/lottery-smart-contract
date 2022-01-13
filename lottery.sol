@@ -25,13 +25,16 @@ contract Lottery{
         return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players.length)));
     }
 
+    error lotteryError(string _error);
+
     function pickWinner() public {
         require(msg.sender == manager);
-        require(players.length > 3);
-
+        if(players.length < 3){
+            revert lotteryError("Not enough players");
+        }
         uint winner = random() % players.length;
         players[winner].transfer(getBalance());
-        
+
         players = new address payable[](0);
     }
 
