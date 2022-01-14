@@ -10,14 +10,17 @@ contract Lottery{
         manager = msg.sender;
     }
     
+    modifier onlyManager{
+        require(msg.sender == manager);
+        _;
+    }
 
     receive() external payable{
         require(msg.value == 0.1 ether);
         players.push(payable (msg.sender));
     }
 
-    function getBalance() public view returns(uint){
-        require(msg.sender == manager);
+    function getBalance() public onlyManager view returns(uint){
         return address(this).balance;
     }
 
@@ -27,8 +30,8 @@ contract Lottery{
 
     error lotteryError(string _error);
 
-    function pickWinner() public {
-        require(msg.sender == manager);
+    function pickWinner() public onlyManager {
+        
         if(players.length < 3){
             revert lotteryError("Not enough players");
         }
